@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Vietnam PropTech AI • Định Giá Bất Động Sản</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <!-- =======================================================================
+       NAVBAR
+       ======================================================================= -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1>Vietnam PropTech AI</h1>
+          <span>Hệ thống định giá & thẩm định bất động sản thông minh</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <div class="tag-badge">
+          <span class="dot"></span>
+          <span>Random Forest • R² 0.74</span>
+        </div>
+
+        <button class="theme-btn" id="themeToggle" title="Đổi giao diện Sáng / Tối">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/>
+            <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =======================================================================
+       MAIN APP CONTAINER
+       ======================================================================= -->
+  <main class="container">
+
+    <!-- Minimal Preset Pills -->
+    <div class="preset-section">
+      <span class="preset-caption">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Dữ liệu mẫu 1-Click:
+      </span>
+      <div class="preset-pills">
+        <button type="button" class="pill-btn" data-preset="binhthanh">📍 Nhà phố Bình Thạnh, TP.HCM</button>
+        <button type="button" class="pill-btn" data-preset="caugiay">📍 Biệt thự Cầu Giấy, Hà Nội</button>
+        <button type="button" class="pill-btn" data-preset="nguhanhson">📍 Nhà phố Ngũ Hành Sơn, Đà Nẵng</button>
+        <button type="button" class="pill-btn" data-preset="ninhkieu">📍 Nhà liền kề Ninh Kiều, Cần Thơ</button>
+      </div>
+    </div>
+
+    <!-- 2-Column Grid -->
+    <div class="main-grid">
+
+      <!-- LEFT: FORM INPUT -->
+      <section class="card">
+        <div class="card-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Thông số bất động sản
+        </div>
+
+        <form id="predictForm" method="POST" action="/" class="form-body">
+          
+          <!-- Address -->
+          <div class="field field-full">
+            <label class="field-label" for="addressInput">
+              <span>Địa chỉ bất động sản *</span>
+              <span id="parsedLoc" style="color: var(--accent-cyan); font-weight: 600; font-size: 0.82rem;"></span>
+            </label>
+            <div class="input-box">
+              <input 
+                type="text" 
+                id="addressInput" 
+                name="Address" 
+                class="input-ctrl" 
+                required 
+                placeholder="VD: Đường Phan Văn Trị, Phường 12, Bình Thạnh, Hồ Chí Minh"
+                value="{{ form_data.get('Address', '') }}"
+              >
+            </div>
+            <!-- City quick chips -->
+            <div class="city-chips">
+              <span style="font-size: 0.76rem; color: var(--text-dim); align-self: center;">Gợi ý nhanh:</span>
+              <button type="button" class="city-chip" data-city="Hồ Chí Minh">+ TP. Hồ Chí Minh</button>
+              <button type="button" class="city-chip" data-city="Hà Nội">+ Hà Nội</button>
+              <button type="button" class="city-chip" data-city="Đà Nẵng">+ Đà Nẵng</button>
+              <button type="button" class="city-chip" data-city="Bình Dương">+ Bình Dương</button>
+              <button type="button" class="city-chip" data-city="Cần Thơ">+ Cần Thơ</button>
+              <button type="button" class="city-chip" data-city="Hải Phòng">+ Hải Phòng</button>
+            </div>
+          </div>
+
+          <!-- Area & Frontage -->
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label" for="areaInput">Diện tích đất (Area) *</label>
+              <div class="input-box">
+                <input 
+                  type="number" 
+                  id="areaInput" 
+                  name="Area" 
+                  class="input-ctrl" 
+                  step="0.1" 
+                  min="1" 
+                  required 
+                  placeholder="85"
+                  value="{{ form_data.get('Area', '') }}"
+                >
+                <span class="unit">m²</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="frontageInput">Mặt tiền (Frontage)</label>
+              <div class="input-box">
+                <input 
+                  type="number" 
+                  id="frontageInput" 
+                  name="Frontage" 
+                  class="input-ctrl" 
+                  step="0.1" 
+                  placeholder="5.0"
+                  value="{{ form_data.get('Frontage', '') }}"
+                >
+                <span class="unit">m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Access Road & Floors -->
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label" for="roadInput">Đường vào (Access Road)</label>
+              <div class="input-box">
+                <input 
+                  type="number" 
+                  id="roadInput" 
+                  name="Access Road" 
+                  class="input-ctrl" 
+                  step="0.1" 
+                  placeholder="6.0"
+                  value="{{ form_data.get('Access Road', '') }}"
+                >
+                <span class="unit">m</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="floorsInput">Số tầng (Floors)</label>
+              <div class="input-box">
+                <input 
+                  type="number" 
+                  id="floorsInput" 
+                  name="Floors" 
+                  class="input-ctrl" 
+                  step="1" 
+                  placeholder="3"
+                  value="{{ form_data.get('Floors', '') }}"
+                >
+                <span class="unit">Tầng</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bedrooms & Bathrooms -->
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label" for="bedsInput">Số phòng ngủ (Bedrooms)</label>
+              <div class="input-box">
+                <input 
+                  type="number" 
+                  id="bedsInput" 
+                  name="Bedrooms" 
+                  class="input-ctrl" 
+                  step="1" 
+                  placeholder="3"
+                  value="{{ form_data.get('Bedrooms', '') }}"
+                >
+                <span class="unit">Phòng</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="bathsInput">Số phòng tắm (Bathrooms)</label>
+              <div class="input-box">
+                <input 
+                  type="number" 
+                  id="bathsInput" 
+                  name="Bathrooms" 
+                  class="input-ctrl" 
+                  step="1" 
+                  placeholder="3"
+                  value="{{ form_data.get('Bathrooms', '') }}"
+                >
+                <span class="unit">WC</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Directions -->
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label">Hướng nhà</label>
+              <select name="House direction" class="input-ctrl">
+                <option value="">-- Chưa xác định --</option>
+                {% for dir in ['Đông', 'Tây', 'Nam', 'Bắc', 'Đông - Bắc', 'Đông - Nam', 'Tây - Bắc', 'Tây - Nam'] %}
+                <option value="{{ dir }}" {% if form_data.get('House direction') == dir %}selected{% endif %}>{{ dir }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Hướng ban công</label>
+              <select name="Balcony direction" class="input-ctrl">
+                <option value="">-- Chưa xác định --</option>
+                {% for dir in ['Đông', 'Tây', 'Nam', 'Bắc', 'Đông - Bắc', 'Đông - Nam', 'Tây - Bắc', 'Tây - Nam'] %}
+                <option value="{{ dir }}" {% if form_data.get('Balcony direction') == dir %}selected{% endif %}>{{ dir }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Legal & Furniture -->
+          <div class="field-group">
+            <div class="field">
+              <label class="field-label">Tình trạng pháp lý</label>
+              <select name="Legal status" class="input-ctrl">
+                <option value="">-- Chưa xác định --</option>
+                <option value="Have certificate" {% if form_data.get('Legal status') == 'Have certificate' %}selected{% endif %}>Đã có sổ đỏ / Sổ hồng (Have certificate)</option>
+                <option value="Sale contract" {% if form_data.get('Legal status') == 'Sale contract' %}selected{% endif %}>Hợp đồng mua bán (Sale contract)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="field-label">Tình trạng nội thất</label>
+              <select name="Furniture state" class="input-ctrl">
+                <option value="">-- Chưa xác định --</option>
+                <option value="Full" {% if form_data.get('Furniture state') == 'Full' %}selected{% endif %}>Nội thất cao cấp đầy đủ (Full)</option>
+                <option value="Basic" {% if form_data.get('Furniture state') == 'Basic' %}selected{% endif %}>Nội thất cơ bản (Basic)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="submit" id="predictBtn" class="btn-submit">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>🚀 Phân Tích & Dự Đoán Giá</span>
+            </button>
+
+            <button type="button" id="randomBtn" class="btn-icon-action" title="Tạo dữ liệu ngẫu nhiên">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="8.5" cy="15.5" r="1.5"/></svg>
+            </button>
+
+            <button type="button" id="resetBtn" class="btn-icon-action" title="Làm mới">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            </button>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- RIGHT: RESULTS -->
+      <section id="resultsContainer" class="result-column">
+        
+        {% if prediction %}
+        <!-- Server-rendered result -->
+        <div class="hero-price-card">
+          <div class="price-top-meta">
+            <span class="price-meta-label">Định giá ước tính bởi AI</span>
+            <span style="font-size: 0.82rem; color: var(--accent-emerald); font-weight: 700;">±6% Biên độ thị trường</span>
+          </div>
+
+          <div class="price-big-row">
+            <span class="price-num" id="animatedPrice">{{ prediction.price_billion_formatted }}</span>
+            <span class="price-unit-tag">TỶ VNĐ</span>
+          </div>
+
+          <div class="price-words-sub">
+            ✨ {{ prediction.price_words }}
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric-cell">
+              <div class="metric-cell-label">Tổng giá trị (VND)</div>
+              <div class="metric-cell-val">{{ prediction.price_vnd_formatted }}</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-cell-label">Quy đổi Ngoại tệ</div>
+              <div class="metric-cell-val" style="color: #38bdf8;">{{ prediction.price_usd_formatted }}</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-cell-label">Đơn giá đất</div>
+              <div class="metric-cell-val" style="color: #34d399;">
+                {% if prediction.price_per_m2_million %}~ {{ prediction.price_per_m2_million }} tr/m²{% else %}--{% endif %}
+              </div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-cell-label">Khoảng giá ước lượng</div>
+              <div class="metric-cell-val" style="color: #f59e0b;">{{ prediction.price_min_billion }} - {{ prediction.price_max_billion }} tỷ</div>
+            </div>
+          </div>
+
+          <div class="range-box">
+            <div class="range-minmax">
+              <span>Thấp: {{ prediction.price_min_billion }} tỷ</span>
+              <span style="color: #a5b4fc; font-weight: 700;">★ Giá chuẩn: {{ prediction.price_billion_formatted }} tỷ</span>
+              <span>Cao: {{ prediction.price_max_billion }} tỷ</span>
+            </div>
+            <div class="range-bar">
+              <div class="range-bar-inner"></div>
+            </div>
+          </div>
+
+          <div class="util-actions">
+            <button class="btn-util" id="copyResultBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Sao chép kết quả
+            </button>
+            <button class="btn-util" onclick="window.print()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+              In báo cáo
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 14px;">Tóm tắt đặc điểm bất động sản</div>
+          <div class="spec-summary">
+            <div class="spec-chip">📍 {{ prediction.district }}, {{ prediction.province }}</div>
+            <div class="spec-chip">📐 {{ prediction.area }} m²</div>
+            <div class="spec-chip">🏢 {{ prediction.floors or 1 }} Tầng</div>
+            <div class="spec-chip">🛏️ {{ prediction.bedrooms or 0 }} PN • {{ prediction.bathrooms or 0 }} WC</div>
+            {% if prediction.direction %}<div class="spec-chip">🧭 {{ prediction.direction }}</div>{% endif %}
+            {% if prediction.legal %}<div class="spec-chip">⚖️ {{ prediction.legal }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 12px;">Trọng số định giá chính (Feature Importance)</div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+              <span>1. Diện tích đất (Area)</span>
+              <span style="color: var(--accent-cyan); font-weight: 700;">42%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+              <span>2. Vị trí địa lý (Tỉnh/Thành, Quận/Huyện)</span>
+              <span style="color: var(--accent-primary); font-weight: 700;">26%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+              <span>3. Số tầng & Quy mô công trình</span>
+              <span style="color: var(--accent-emerald); font-weight: 700;">18%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted);">
+              <span>4. Mặt tiền & Đường vào</span>
+              <span style="color: var(--accent-amber); font-weight: 700;">14%</span>
+            </div>
+          </div>
+        </div>
+
+        {% else %}
+        <!-- Clean Empty State with Model Details to Balance Viewport -->
+        <div class="card empty-state">
+          <div class="empty-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div style="font-weight: 700; font-size: 1.1rem;">Sẵn Sàng Định Giá Bất Động Sản</div>
+          <p class="empty-text">Chọn một trong các <strong>Dữ liệu mẫu 1-Click</strong> phía trên hoặc nhập thông số và nhấn <strong>Dự đoán giá</strong>.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="font-size: 0.95rem; margin-bottom: 12px;">Cấu trúc Pipeline Mô hình AI</div>
+          <div class="spec-summary" style="margin-bottom: 14px;">
+            <div class="spec-chip" style="background: rgba(99, 102, 241, 0.12); border-color: rgba(99, 102, 241, 0.3); color: #a5b4fc;">
+              ⚡ Random Forest Regressor (100 Trees)
+            </div>
+            <div class="spec-chip" style="background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.3); color: #67e8f9;">
+              📊 SimpleImputer + StandardScaler
+            </div>
+            <div class="spec-chip" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: #6ee7b7;">
+              🔠 OrdinalEncoder (6 Categorical Features)
+            </div>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-dim); line-height: 1.5;">
+            Hệ thống học máy tự động xử lý giá trị khuyết thiếu (NaN), chuẩn hóa thang đo số học và phân loại địa danh theo phân cấp Tỉnh/Thành & Quận/Huyện.
+          </p>
+        </div>
+        {% endif %}
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Client Script -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
